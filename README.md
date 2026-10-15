@@ -11,13 +11,6 @@ uvicorn app.main:app --port 8000
 ```
 Indexes are created idempotently at startup. `/health` returns 503 until MongoDB answers a ping.
 
-## Tests
-```bash
-pip install -r requirements-dev.txt
-pytest -q tests/test_rules_and_crud.py              # offline: R1-R5 + CRUD/concurrency paths on mongomock (33 tests)
-MONGO_URI=mongodb://localhost:27017 python tests/check_against_mongo.py   # real MongoDB, uses DB "attendance_selfcheck"
-```
-`check_against_mongo.py` seeds an edge-case dataset and compares every analytics endpoint with an independent oracle written from the rules. The dataset has ties, weekend records, zero-log, mid-month and future joiners, an overnight shift, half days, legacy records and an orphan log. The script also checks parallel requests against a real uvicorn, and explain plans (IXSCAN, no COLLSCAN) on about 100k records.
 
 ## Interpretations worth knowing
 - `moving_avg_7d` averages the *reported* (4-decimal, rounded) `attendance_rate` values of the window.
